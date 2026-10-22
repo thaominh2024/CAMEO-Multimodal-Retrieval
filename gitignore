@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.env
+.venv/
+.ipynb_checkpoints/
+data/raw/
+data/processed/
+data/images/
+checkpoints/
+third_party/
+*.gguf
+*.pkl
+*.joblib
+results/*.csv
