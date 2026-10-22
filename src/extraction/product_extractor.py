@@ -1,4 +1,61 @@
+import argparse
+import json
+import re
+from pathlib import Path
+import pandas as pd
 
+FIELDS = ("ingredient", "capacity", "type")
+
+PROMPT = """You are an expert e-commerce data extraction AI. Read the PRODUCT NAME and output a JSON object.
+
+RULES:
+1. NO HALLUCINATIONS. Extract exact words present in the text.
+2. If information is missing, output an empty string "".
+
+KEY DEFINITIONS:
+- "ingredient": The main active ingredients, natural extracts, plants, herbs, or special materials (e.g., Aloe Vera, Centella, Mint, Red Ginseng, Rice milk, Snail, Tea Tree). DO NOT extract adjectives (Gentle, Purifying), product formats (Gel, Foam), or skin issues (Acne, Oily, Dirt).
+- "capacity": Volume or weight containing numbers and units (e.g., 150ml, 591 ml, 50ml, 130ml, 80g).
+- "type": The specific format of the product (e.g., Facial Cleanser, Foam Cleanser, Gel Cleanser, Face Wash).
+
+--- EXAMPLES ---
+Text: "Civic Rice milk Rice Facial Cleanser"
+JSON: {{"ingredient": "Rice milk", "capacity": "", "type": "Facial Cleanser"}}
+
+Text: "Centella and Mint Extract Facial Cleanser"
+JSON: {{"ingredient": "Centella, Mint", "capacity": "", "type": "Facial Cleanser"}}
+
+Text: "Cetaphil Facial Cleanser 591 ml (Guaranteed 100%)"
+JSON: {{"ingredient": "", "capacity": "591 ml", "type": "Facial Cleanser"}}
+--- END OF EXAMPLES ---
+
+PRODUCT NAME: {text}
+JSON:
+"""
+
+
+def load_model(repo_id: str, filename: str, n_ctx: int):
+    from llama_cpp import Llama
+
+    return Llama.from_pretrained(
+        repo_id=repo_id,
+        filename=filename,
+        verbose=False,
+        n_ctx=n_ctx,
+        repeat_penalty=1.2,
+    )
+
+
+def parse_model_output(content: str) -> dict[str, str]:
+    match = re.search(r"\{.*?\}", content or "", flags=re.DOTALL)
+    if not match:
+        return {key: "N/A" for key in FIELDS}
+    try:
+        payload = json.loads(match.group(0))
+        if not isinstance(payload, dict):
+            raise ValueError("Model output must be a JSON object")
+        return {key: str(payload.get(key) or "") for key in FIELDS}
+    except (ValueError, TypeError):
+        return {key: "N/A" for key in FIELDS}
 
 def extract_product_info(product_name: str, model) -> dict[str, str]:
     response = model.create_chat_completion(
