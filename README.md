@@ -11,34 +11,30 @@ Output
 A ranked list of candidate products from a gallery catalog of 4,000+ items.
 
 ## Repository Structure
+
+```text
 CAMEO-Multimodal-Retrieval/
 ├── main.py
 ├── config.py
 ├── requirements.txt
 ├── README.md
-│
 ├── src/
 │   ├── extraction/
 │   │   ├── product_extractor.py
 │   │   └── query_parser.py
-│   │
 │   ├── models/
 │   │   ├── magiclens.py
 │   │   └── text_encoder.py
-│   │
 │   ├── retrieval/
 │   │   ├── filtering.py
 │   │   └── ranking.py
-│   │
 │   └── pipeline.py
-│
 ├── notebooks/
 │   ├── extract.ipynb
 │   ├── cameo-easybutokay.ipynb
 │   └── magiclens.ipynb
-│
 ├── data/
 │   └── README.md
-│
 └── results/
     └── metrics.csv
+```
