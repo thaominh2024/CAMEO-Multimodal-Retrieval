@@ -19,6 +19,38 @@ The benchmark data is provided by the **CAMEO: Composed Access to Multimodal E-c
 | **Product Name**        | *Simple Gentle & Refreshing Facial Cleanser - for sensitive skin 150ml*                                                                                                                                                                                                                                                                    |
 | **Product Description** | *Simple Facial Cleanser is gentle, cleanses, and refreshes for sensitive skin. It contains x2 Vitamin B5, Vitamin E, and Pro Amino Acids, which effectively cleanse the skin, sweeping away oil, dirt, and other impurities without causing skin irritation. It leaves skin soft and smooth, while providing a fresh and clean feeling...* |
 
+## Approach
+```text
+                      DATASET
+                         |
+                         v
+         Using Qwen for atribute extraction 
+                         |
+                         v
+Verified structured product metadata + product images
+
+                  QUERY RETRIEVAL
+Reference product/image + modification question
+                         |
+                         v
+            Qwen2.5 query parsing (Ollama)
+                         |
+                         v
+Metadata filtering (brand, origin, price, capacity)
+                         |
+                         v
+                Candidate products
+                    /         \
+                   v           v
+          MagicLens visual   Semantic
+          similarity         similarity
+                   \           /
+                    v         v
+                  Late-fusion ranking
+                          |
+                          v
+                  Top-K products
+```
 ## Repository Structure
 
 ```text
